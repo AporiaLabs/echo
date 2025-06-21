@@ -46,5 +46,14 @@ model Tweet {
 }
 
 model DiscordMessage {
+  id          String   @id
+  content     String
+  userId      String
+  username    String
+  channelId   String
+  guildId     String?
+  createdAt   DateTime @default(now())
 
+  @@index([userId])
+  @@index([channelId])
 }
