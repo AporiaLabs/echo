@@ -44,3 +44,7 @@ model Tweet {
   @@index([conversationId])
   @@index([createdAt])
 }
+
+model DiscordMessage {
+
+}
