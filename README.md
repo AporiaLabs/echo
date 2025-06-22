@@ -11,8 +11,8 @@ Built for Developers Who Want
 1. **Clone and Install**
 
    ```bash
-   git clone https://github.com/AporiaLabs/Echo
-   cd Echo
+   git clone https://github.com/AporiaLabs/echo
+   cd echo
    pnpm install
    ```
 
