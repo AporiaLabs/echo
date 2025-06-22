@@ -22,4 +22,44 @@ Built for Developers Who Want
    cp .env.example .env
    ```
 
-   Required environment variables:
+   **Required environment variables:**
+
+
+   ```bash
+   # Database config
+   DATABASE_URL="postgresql://user:password@localhost:5432/dbname"
+   # Make sure to change to postgres in prisma
+   # For SQLite use: DATABASE_URL="file:./prisma/dev.db"
+   
+   # OpenAI API configuration
+   OPENAI_API_KEY="your-openai-api-key"
+
+   # OpenRouter API configuration
+   OPENROUTER_API_KEY="your-openrouter-api-key"
+
+   # Application configuration
+   APP_URL="http://localhost:3000"  # Mandatory for OpenRouter 
+   
+   # Social Media Configuration
+   DISCORD_APPLICATION_ID=
+   DISCORD_API_TOKEN=
+   TWITTER_USERNAME=
+   TWITTER_PASSWORD=
+   TWITTER_EMAIL=
+   TWITTER_POST_INTERVAL_HOURS=4
+   TWITTER_POLLING_INTERVAL=5 # In minutes
+   TWITTER_DRY_RUN=true
+
+   SERVER_PORT=3000
+   ```
+
+3. **Initialize Database**
+
+   ```bash
+   npm run init-db
+   ```
+
+4. **Start Development**
+   ```bash
+   npm run dev
+   ```
