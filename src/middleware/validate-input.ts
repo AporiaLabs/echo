@@ -29,6 +29,17 @@ export const validateInput: AgentMiddleware = async (req, res, next) => {
 				);
 			}
 			break;
+		// case "audio":
+		// 	if (!input.audioUrl) {
+		// 		return res.error(new Error("Audio input requires audioUrl field"));
+		// 	}
+		// 	break;
+		// case "video":
+		// 	if (!input.videoUrl) {
+		// 		return res.error(new Error("Video input requires videoUrl field"));
+		// 	}
+		// 	break;
 	}
+
 	await next();
 };
