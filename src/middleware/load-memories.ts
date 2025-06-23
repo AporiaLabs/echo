@@ -56,3 +56,5 @@ export function createLoadMemoriesMiddleware(
 		}
 	};
 }
+
+export const loadMemories = createLoadMemoriesMiddleware();
