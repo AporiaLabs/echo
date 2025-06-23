@@ -74,5 +74,23 @@ Respond with a JSON object containing:
 			);
 			console.warn(`Reasoning: ${routeDecision.reasoning}`);
 		}
-  }
-}
+
+		// Execute the selected route handler
+		try {
+			// Call the handler with context and request/response objects
+			await handler.handler(req.context || "", req, res);
+			await next();
+		} catch (error) {
+			// Handle errors from the route handler
+			await res.error(
+				new Error(
+					`Route handler error (${routeDecision.selectedRoute}): ${
+						(error as Error).message
+					}`
+				)
+			);
+		}
+	} catch (error) {
+		await res.error(new Error(`Router error: ${(error as Error).message}`));
+	}
+};
