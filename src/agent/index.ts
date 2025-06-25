@@ -70,5 +70,49 @@ export class BaseAgent implements Agent {
 			this.character.adjectives,
 			3
 		).join(", ");
-  }
+
+		return `
+<SYSTEM_PROMPT>
+${this.getSystemPrompt()}
+</SYSTEM_PROMPT>
+
+<BIO_CONTEXT>
+${bioContext}
+</BIO_CONTEXT>
+
+<LORE_CONTEXT>
+${loreContext}
+</LORE_CONTEXT>
+
+<MESSAGE_EXAMPLES>
+${messageContext}
+</MESSAGE_EXAMPLES>
+
+<POST_EXAMPLES>
+${postContext}
+</POST_EXAMPLES>
+
+<INTERESTS>
+${topicContext}
+</INTERESTS>
+
+<STYLE_GUIDELINES>
+<ALL_STYLE>
+${styleAllContext}
+</ALL_STYLE>
+
+<CHAT_STYLE>
+${styleChatContext}
+</CHAT_STYLE>
+</STYLE_GUIDELINES>
+
+<ADJECTIVES>
+${adjectiveContext}
+</ADJECTIVES>
+`.trim();
+	}
+
+	public getRoutes(): Route[] {
+		return this.routes;
+	}
 }
