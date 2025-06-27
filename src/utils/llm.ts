@@ -444,4 +444,146 @@ export class LLMUtils {
 			throw error;
 		}
 	}
+
+	async getImageDescriptions(
+		imageUrls: string[],
+		model: string = "openai/gpt-4o"
+	): Promise<string> {
+		if (!imageUrls || imageUrls.length === 0)
+			throw new Error("No images provided");
+
+		const base64Images = await convertUrlsToBase64(imageUrls);
+		if (base64Images.length === 0) {
+			throw new Error("Failed to process images");
+		}
+
+		try {
+			const response = await axios.post(
+				"https://openrouter.ai/api/v1/chat/completions",
+				{
+					model,
+					messages: [
+						{
+							role: "user",
+							content: [
+								{
+									type: "text",
+									text: "Describe the image(s) in a couple of concise sentences that capture the most important elemetns of the image:",
+								},
+								...base64Images.map((image) => ({
+									type: "image_url",
+									image_url: {
+										url: `data:${image.contentType};base64,${image.base64}`,
+									},
+								})),
+							],
+						},
+					],
+					max_tokens: 1000,
+				},
+				{
+					headers: {
+						Authorization: `Bearer ${this.openrouterApiKey}`,
+						"Content-Type": "application/json",
+						"HTTP-Referer": process.env.APP_URL || "http://localhost:3000",
+					},
+				}
+			);
+
+			if (!response.data?.choices?.[0]?.message?.content) {
+				throw new Error("Invalid response format from OpenRouter");
+			}
+
+			return response.data.choices[0].message.content;
+		} catch (error) {
+			if (axios.isAxiosError(error)) {
+				throw new Error(
+					`OpenRouter API error: ${error.response?.statusText || error.message}`
+				);
+			}
+			throw error;
+		}
+	}
+}
+
+interface Base64Image {
+	base64: string;
+	contentType: string;
+}
+
+async function fetchImageAsBase64(url: string): Promise<Base64Image | null> {
+	try {
+		const response = await axios.get(url, {
+			responseType: "arraybuffer",
+		});
+		const contentType = response.headers["content-type"];
+		if (
+			!contentType ||
+			!["image/jpeg", "image/png", "image/gif", "image/webp"].includes(
+				contentType
+			)
+		) {
+			console.warn(`Unsupported image type: ${contentType}, url: ${url}`);
+			return null;
+		}
+		return {
+			base64: Buffer.from(response.data, "binary").toString("base64"),
+			contentType,
+		};
+	} catch (error) {
+		console.error("Error fetching image:", error);
+		return null;
+	}
+}
+
+async function convertUrlsToBase64(
+	imageUrls: string[]
+): Promise<Base64Image[]> {
+	const base64Images: Base64Image[] = [];
+	for (const url of imageUrls) {
+		const result = await fetchImageAsBase64(url);
+		if (result) {
+			base64Images.push(result);
+		}
+	}
+	return base64Images;
+}
+
+/**
+ * Parses a data stream of SSE lines from OpenRouter.
+ *
+ * @param chunk The chunk of data (a portion of the SSE event stream).
+ * @param onToken Callback to handle each token (partial text).
+ */
+function parseSSEChunk(chunk: Buffer, onToken: (token: string) => void) {
+	const raw = chunk.toString("utf-8");
+	const lines = raw.split("\n");
+
+	for (const line of lines) {
+		if (!line || line.trim().length === 0) {
+			continue;
+		}
+		// "data: [DONE]" indicates the end of the stream
+		if (line.trim() === "data: [DONE]") {
+			return; // you could handle a cleanup or a "done" signal here if needed
+		}
+		if (line.startsWith("data: ")) {
+			// Each line after "data:" should be valid JSON, e.g.:
+			// data: {"id":"...","object":"...","created":...,"choices":[...]...}
+			const jsonString = line.substring("data: ".length).trim();
+			try {
+				const parsed = JSON.parse(jsonString);
+				if (parsed.choices && parsed.choices.length > 0) {
+					// The partial token usually appears in choices[0].delta.content
+					const token = parsed.choices[0].delta?.content;
+					if (token) {
+						onToken(token);
+					}
+				}
+			} catch (err) {
+				// If some lines are not valid JSON, you can handle or ignore them
+				console.error("Failed to parse SSE line:", line, err);
+			}
+		}
+	}
 }
