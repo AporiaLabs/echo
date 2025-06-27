@@ -1,7 +1,7 @@
 # Echo
 
 <div align="center">
-  <img src="assets/echo.jpg" alt="Introducing: Echo" width="500" height="500" />
+  <img src="icons/echo2.jpg" alt="Introducing: Echo" width="500" height="500" />
   <p><em>A Framework for AI Agents by <a href="https://aporia.cc/echo">Aporia Labs</a></em></p>
 </div>
 
