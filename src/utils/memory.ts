@@ -67,3 +67,54 @@ export async function storeTweetIfNotExists(
 
 	return false; // Indicates tweet already existed
 }
+export async function getTweetById(tweetId: string) {
+	return prisma.tweet.findUnique({
+		where: { id: tweetId },
+	});
+}
+
+export async function getTweetThread(conversationId: string) {
+	return prisma.tweet.findMany({
+		where: { conversationId },
+		orderBy: { createdAt: "asc" },
+	});
+}
+
+export async function getRecentTweets(userId: string, limit: number = 10) {
+	return prisma.tweet.findMany({
+		where: { userId },
+		orderBy: { createdAt: "desc" },
+		take: limit,
+	});
+}
+
+/**
+ * Interface representing Discord message data structure
+ */
+export interface DiscordMessageData {
+	id: string;
+	content: string;
+	userId: string;
+	username: string;
+	channelId: string;
+	guildId?: string;
+}
+
+export async function createDiscordMemory(
+	userId: string,
+	agentId: string,
+	roomId: string,
+	message: string,
+	generator: string = "llm"
+) {
+	await prisma.memory.create({
+		data: {
+			userId,
+			agentId,
+			roomId,
+			type: "discord",
+			generator: generator,
+			content: JSON.stringify({ text: message }),
+		},
+	});
+}
