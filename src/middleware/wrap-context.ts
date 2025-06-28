@@ -51,5 +51,24 @@ export const wrapContext: AgentMiddleware = async (req, res, next) => {
 			? `Description of attached images:\n${imageDescriptions}`
 			: undefined;
 		req.context = `
-  }
-}
+<PREVIOUS_CONVERSATION>
+${memories}
+</PREVIOUS_CONVERSATION>
+
+<AGENT_CONTEXT>
+${agentContext}
+</AGENT_CONTEXT>
+
+<CURRENT_USER_INPUT>
+ TEXT: ${currentInput}
+${imageDescriptions ? `\nIMAGES:\n${imageDescriptions}` : ""}
+</CURRENT_USER_INPUT>
+`.trim();
+
+		await next();
+	} catch (error) {
+		await res.error(
+			new Error(`Failed to wrap context: ${(error as Error).message}`)
+		);
+	}
+};
