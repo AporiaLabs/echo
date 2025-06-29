@@ -85,5 +85,3 @@ export class DiscordClient extends DiscordBase {
     }
   }
 }
-
-  
