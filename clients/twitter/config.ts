@@ -9,3 +9,7 @@ const twitterConfigSchema = z.object({
     postIntervalHours: z.number().int().min(1).default(4),
     enableActions: z.boolean().default(false)
 });
+
+module.exports = {
+    twitterConfigSchema
+};
