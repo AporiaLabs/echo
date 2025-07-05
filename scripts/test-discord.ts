@@ -12,3 +12,12 @@ function log(message: string, ...args: any[]) {
     console.log(`[DEBUG] ${message}`, ...args);
   }
 }
+
+
+const config = {
+  botToken: process.env.DISCORD_BOT_TOKEN!,
+  agentId: "test-agent",
+  retryLimit: 3,
+  pollingInterval: 1,
+  dryRun: false
+};
