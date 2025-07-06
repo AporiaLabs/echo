@@ -63,7 +63,11 @@ async function main() {
         console.log("Test 2: Testing rate limiting...");
         await client.sendMessage(targetUserId, "This is a follow-up message (should be delayed by 1000ms)");
         console.log("Rate-limited message sent successfully");
-
-      }
-    }
-  }:
+        
+        // Test 3: Message with formatting
+        console.log("Test 3: Testing message with formatting...");
+        await client.sendMessage(
+          targetUserId, 
+          "This message has **bold text**, *italics*, and `code blocks`.\n" +
+          "It also has multiple lines and a [link](https://example.com)."
+        );
