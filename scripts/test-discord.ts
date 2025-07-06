@@ -86,4 +86,21 @@ async function main() {
       }
     }
   }, 5000);
+
+  try {
+    await client.start();
+    console.log("Discord client started successfully");
+    
+    // Keep the process running
+    process.on('SIGINT', async () => {
+      console.log("Stopping Discord client...");
+      await client.stop();
+      process.exit(0);
+    });
+  } catch (error) {
+    console.error("Error testing Discord client:", error);
+    process.exit(1);
+  }
 }
+
+main();
