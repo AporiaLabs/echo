@@ -38,3 +38,19 @@ async function main() {
     getSystemPrompt: () => "Test system prompt",
     addRoute: () => {}
   };
+
+
+  const client = new DiscordClient(mockAgent, config);
+
+  // Test sending multiple DMs to verify rate limiting
+  setTimeout(async () => {
+    try {
+      console.log("Testing Discord client functionality...");
+      
+      console.log("Waiting for Discord ID to test messaging functionality...");
+      // Note: Replace USER_ID with the actual Discord user ID when provided
+      const targetUserId = process.env.DISCORD_TEST_USER_ID;
+      
+      if (!targetUserId) {
+        console.log("No test user ID provided. Please set DISCORD_TEST_USER_ID environment variable.");
+        return;
