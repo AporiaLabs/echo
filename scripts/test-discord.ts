@@ -58,3 +58,12 @@ async function main() {
         console.log("Test 1: Sending basic message...");
         await client.sendMessage(targetUserId, "Hello! This is a test message from the Discord bot.");
         console.log("Basic message sent successfully");
+
+        // Test 2: Rate limiting (single message for now)
+        console.log("Test 2: Testing rate limiting...");
+        await client.sendMessage(targetUserId, "This is a follow-up message (should be delayed by 1000ms)");
+        console.log("Rate-limited message sent successfully");
+
+      }
+    }
+  }:
