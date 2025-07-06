@@ -21,3 +21,20 @@ const config = {
   pollingInterval: 1,
   dryRun: false
 };
+
+
+log("Environment variables loaded");
+console.log("Bot token:", process.env.DISCORD_BOT_TOKEN ? "Found" : "Missing");
+console.log("Test user ID:", process.env.DISCORD_TEST_USER_ID ? "Found" : "Missing");
+
+async function main() {
+  console.log("Starting Discord client test...");
+  
+  // Create mock agent
+  const mockAgent = {
+    getAgentId: () => "test-agent",
+    getAgentContext: () => "Test agent context",
+    getRoutes: () => [],
+    getSystemPrompt: () => "Test system prompt",
+    addRoute: () => {}
+  };
