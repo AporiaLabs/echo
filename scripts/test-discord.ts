@@ -13,7 +13,6 @@ function log(message: string, ...args: any[]) {
   }
 }
 
-
 const config = {
   botToken: process.env.DISCORD_BOT_TOKEN!,
   agentId: "test-agent",
@@ -21,7 +20,6 @@ const config = {
   pollingInterval: 1,
   dryRun: false
 };
-
 
 log("Environment variables loaded");
 console.log("Bot token:", process.env.DISCORD_BOT_TOKEN ? "Found" : "Missing");
@@ -39,7 +37,6 @@ async function main() {
     addRoute: () => {}
   };
 
-
   const client = new DiscordClient(mockAgent, config);
 
   // Test sending multiple DMs to verify rate limiting
@@ -54,3 +51,10 @@ async function main() {
       if (!targetUserId) {
         console.log("No test user ID provided. Please set DISCORD_TEST_USER_ID environment variable.");
         return;
+      }
+
+      try {
+        // Test 1: Basic message sending
+        console.log("Test 1: Sending basic message...");
+        await client.sendMessage(targetUserId, "Hello! This is a test message from the Discord bot.");
+        console.log("Basic message sent successfully");
