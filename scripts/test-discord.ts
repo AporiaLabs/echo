@@ -71,3 +71,19 @@ async function main() {
           "This message has **bold text**, *italics*, and `code blocks`.\n" +
           "It also has multiple lines and a [link](https://example.com)."
         );
+        console.log("Formatted message sent successfully");
+      } catch (error) {
+        console.error("Error during message tests:", error);
+      }
+    } catch (error) {
+      console.error("Error in Discord client tests:", error);
+      // Type guard for Discord API errors
+      if (error && typeof error === 'object' && 'code' in error) {
+        const discordError = error as { code: number };
+        if (discordError.code === 50035) {
+          console.error("Invalid user ID format. Make sure to use Discord's snowflake ID format.");
+        }
+      }
+    }
+  }, 5000);
+}
