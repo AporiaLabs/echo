@@ -86,7 +86,7 @@ async function main() {
       }
     }
   }, 5000);
-  
+
   try {
     await client.start();
     console.log("Discord client started successfully");
