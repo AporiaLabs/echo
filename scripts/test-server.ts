@@ -7,3 +7,7 @@ app.use(express.json());
 app.post('/agent/input', (req, res) => {
   console.log('Received request:', req.body);
   
+  // Mock response
+  const response = `Test response to: ${req.body.input.text}`;
+  res.json(response);
+});
