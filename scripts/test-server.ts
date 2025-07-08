@@ -2,3 +2,8 @@ import express from 'express';
 
 const app = express();
 app.use(express.json());
+
+// Mock agent endpoint
+app.post('/agent/input', (req, res) => {
+  console.log('Received request:', req.body);
+  
