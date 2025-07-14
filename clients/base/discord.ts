@@ -98,13 +98,6 @@ export class DiscordBase extends EventEmitter {
     });
   }
 
-  /**
-   * Utility method to delay execution
-   * @param ms Milliseconds to delay
-   */
-  protected delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
 
   /**
    * Clean up resources and disconnect
