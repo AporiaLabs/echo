@@ -1,32 +1,87 @@
 import { LLMUtils } from "../utils/llm";
-import { AgentRequest, AgentResponse, LLMSize } from "../types";
+import { AgentRequest, AgentResponse } from "../types";
 import { createTwitterMemory } from "../utils/memory";
 
-// Initialize LLM utility for text generation
-const tweetGenerator = new LLMUtils();
+const llmUtils = new LLMUtils();
+
+const sanitize = (s: string): string =>
+  String(s || "").trim().replace(/^["'`]+|["'`]+$/g, "");
+
+const BANNED = [
+  "", ""
+];
+
+const THEMES = [
+  "", ""
+];
+
+function containsBanned(text: string): boolean {
+  const t = text.toLowerCase();
+  return BANNED.some((p) => t.includes(p));
+}
 
 export const handleTweetGeneration = async (
-	context: string,
-	req: AgentRequest,
-	res: AgentResponse
-) => {
-	// Generate tweet content using LLM
-	const tweetContent = await tweetGenerator.getTextFromLLM(
-		`${context}\n\n
-       <SYSTEM> Look at the previous twitter context then generate a original and engaging tweet that fits in with your character and previous twitter history. ONLY output the tweet, no reflection on it. No "Tweet: ". Just the text of the tweet. The text you output will be posted directly to twitter.</SYSTEM>`,
-		"anthropic/claude-3.5-sonnet"
-	);
+  context: string,
+  req: AgentRequest,
+  res: AgentResponse
+): Promise<void> => {
+  const now = new Date().toISOString();
+  let attempt = 0;
+  let tweet = "";
 
-	const logMessage = `Tweeted: ${tweetContent}`;
+  while (attempt < 5) { // allow more retries to avoid banned content
+    const theme = THEMES[Math.floor(Math.random() * THEMES.length)];
+    const nonce = Math.random().toString(36).slice(2);
 
-	// Store the tweet in memory for future context
-	await createTwitterMemory(
-		req.input.userId,
-		req.input.agentId,
-		req.input.roomId,
-		logMessage
-	);
+    const prompt = `${context}
 
-	// Send the generated tweet as response
-	await res.send(tweetContent);
+<SYSTEM>
+Generate ONE original tweet for x (@x).
+Constraints:
+- 
+-
+-
+-
+Timestamp: ${now}
+Nonce: ${nonce}
+</SYSTEM>`;
+
+    const raw = await llmUtils.getTextFromLLM(
+      prompt,
+      "anthropic/claude-3.5-sonnet"
+    );
+
+    tweet = sanitize(raw);
+
+    // Only break if tweet is valid and doesn’t contain banned phrases
+    if (tweet.length >= 30 && tweet.length <= 280 && !containsBanned(tweet)) {
+      break;
+    }
+
+    console.warn(`[tweet-gen] Rejected due to ban or length (attempt ${attempt + 1})`);
+    attempt++;
+  }
+
+  // If still empty or banned, final forced prompt that cannot produce banned lines
+  if (!tweet || containsBanned(tweet)) {
+    const raw = await llmUtils.getTextFromLLM(
+      `<SYSTEM>
+Write a single, fresh tweet in x's voice about discipline and daily practice.
+Do NOT use any of these phrases: ${BANNED.join(", ")}.
+No metaphors with x, x, x, or "x:".
+140–240 chars. Only the tweet text.
+</SYSTEM>`,
+      "anthropic/claude-3.5-sonnet"
+    );
+    tweet = sanitize(raw);
+  }
+
+  const message = `Tweeted: ${tweet}`;
+  await createTwitterMemory(
+    req.input.userId,
+    req.input.agentId,
+    req.input.roomId,
+    message
+  );
+  await res.send(tweet);
 };
